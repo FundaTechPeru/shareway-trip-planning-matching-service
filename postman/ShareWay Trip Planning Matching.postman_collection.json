@@ -1,0 +1,70 @@
+{
+  "info": {
+    "name": "ShareWay Trip Planning & Matching",
+    "description": "TP1 collection for validating the Trip Planning & Matching microservice.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health check",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/actuator/health"
+      }
+    },
+    {
+      "name": "Register driver availability",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"driverId\": 10,\n  \"operationZone\": \"Chorrillos\",\n  \"availableDate\": \"2026-10-04\",\n  \"startTime\": \"07:00:00\",\n  \"endTime\": \"09:00:00\",\n  \"availableSeats\": 3\n}"
+        },
+        "url": "{{baseUrl}}/api/v1/driver-availabilities"
+      }
+    },
+    {
+      "name": "Create trip request",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"passengerId\": 25,\n  \"originLabel\": \"UPC Monterrico\",\n  \"destinationLabel\": \"Chorrillos\",\n  \"operationZone\": \"Chorrillos\",\n  \"originLat\": -12.104800,\n  \"originLng\": -76.963200,\n  \"destinationLat\": -12.172100,\n  \"destinationLng\": -77.016400,\n  \"travelDate\": \"2026-10-04\",\n  \"earliestDeparture\": \"07:30:00\",\n  \"latestDeparture\": \"08:30:00\",\n  \"seatsRequested\": 1\n}"
+        },
+        "url": "{{baseUrl}}/api/v1/trip-requests"
+      }
+    },
+    {
+      "name": "Generate match proposals",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/v1/trip-requests/1/match-proposals"
+      }
+    },
+    {
+      "name": "List match proposals",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/v1/trip-requests/1/match-proposals"
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8081"
+    }
+  ]
+}
