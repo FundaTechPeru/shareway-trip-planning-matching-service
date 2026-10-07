@@ -74,7 +74,7 @@ Crear una instancia PostgreSQL y copiar sus datos de conexion:
 Para Spring Boot, la URL debe quedar con formato JDBC:
 
 ```text
-jdbc:postgresql://<filess-host>:<filess-port>/<filess-database>?sslmode=require
+jdbc:postgresql://<filess-host>:<filess-port>/<filess-database>
 ```
 
 ### 2. Configurar el servicio en Render
@@ -84,7 +84,7 @@ Crear un Web Service desde este repositorio usando Docker y la rama `main`.
 Variables de entorno requeridas:
 
 ```text
-SPRING_DATASOURCE_URL=jdbc:postgresql://<filess-host>:<filess-port>/<filess-database>?sslmode=require
+SPRING_DATASOURCE_URL=jdbc:postgresql://<filess-host>:<filess-port>/<filess-database>
 SPRING_DATASOURCE_USERNAME=<filess-user>
 SPRING_DATASOURCE_PASSWORD=<filess-password>
 SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE=5
