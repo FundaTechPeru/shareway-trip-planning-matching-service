@@ -74,8 +74,10 @@ Crear una instancia PostgreSQL y copiar sus datos de conexion:
 Para Spring Boot, la URL debe quedar con formato JDBC:
 
 ```text
-jdbc:postgresql://<filess-host>:<filess-port>/<filess-database>
+jdbc:postgresql://<filess-host>:<filess-port>/<filess-database>?currentSchema=<filess-user>
 ```
+
+Filess no crea un schema `public` usable por defecto. Por eso el servicio debe usar un schema propio, normalmente con el mismo nombre del usuario/base de datos entregado por Filess.
 
 ### 2. Configurar el servicio en Render
 
@@ -84,11 +86,13 @@ Crear un Web Service desde este repositorio usando Docker y la rama `main`.
 Variables de entorno requeridas:
 
 ```text
-SPRING_DATASOURCE_URL=jdbc:postgresql://<filess-host>:<filess-port>/<filess-database>
+SPRING_DATASOURCE_URL=jdbc:postgresql://<filess-host>:<filess-port>/<filess-database>?currentSchema=<filess-user>
 SPRING_DATASOURCE_USERNAME=<filess-user>
 SPRING_DATASOURCE_PASSWORD=<filess-password>
 SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE=5
 SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE=1
+SPRING_FLYWAY_SCHEMAS=<filess-user>
+SPRING_FLYWAY_DEFAULT_SCHEMA=<filess-user>
 ```
 
 Render define automaticamente la variable `PORT`; la aplicacion la usa como puerto principal en despliegue. Localmente conserva `8081` como valor por defecto.

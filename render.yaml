@@ -16,3 +16,7 @@ services:
         value: 5
       - key: SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE
         value: 1
+      - key: SPRING_FLYWAY_SCHEMAS
+        sync: false
+      - key: SPRING_FLYWAY_DEFAULT_SCHEMA
+        sync: false
