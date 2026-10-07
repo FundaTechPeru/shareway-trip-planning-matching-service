@@ -57,6 +57,58 @@ Postman collection:
 postman/ShareWay Trip Planning Matching.postman_collection.json
 ```
 
+## Despliegue en Render con base de datos Filess.io
+
+El repositorio incluye `render.yaml` para crear el Web Service como contenedor Docker en Render. La base de datos no se versiona en el repositorio: se configura con variables de entorno usando la instancia PostgreSQL creada en Filess.io.
+
+### 1. Crear la base de datos en Filess.io
+
+Crear una instancia PostgreSQL y copiar sus datos de conexion:
+
+- Host
+- Puerto
+- Nombre de base de datos
+- Usuario
+- Password
+
+Para Spring Boot, la URL debe quedar con formato JDBC:
+
+```text
+jdbc:postgresql://<filess-host>:<filess-port>/<filess-database>?sslmode=require
+```
+
+### 2. Configurar el servicio en Render
+
+Crear un Web Service desde este repositorio usando Docker y la rama `main`.
+
+Variables de entorno requeridas:
+
+```text
+SPRING_DATASOURCE_URL=jdbc:postgresql://<filess-host>:<filess-port>/<filess-database>?sslmode=require
+SPRING_DATASOURCE_USERNAME=<filess-user>
+SPRING_DATASOURCE_PASSWORD=<filess-password>
+SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE=5
+SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE=1
+```
+
+Render define automaticamente la variable `PORT`; la aplicacion la usa como puerto principal en despliegue. Localmente conserva `8081` como valor por defecto.
+
+Health check para Render:
+
+```text
+/actuator/health
+```
+
+### 3. Validar el despliegue
+
+Cuando Render termine el deploy, verificar:
+
+```text
+https://<render-service>.onrender.com/actuator/health
+https://<render-service>.onrender.com/swagger-ui.html
+https://<render-service>.onrender.com/v3/api-docs
+```
+
 ## Endpoints iniciales
 
 Crear disponibilidad de conductor:
