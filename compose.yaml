@@ -1,0 +1,34 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: shareway-trip-planning-postgres
+    environment:
+      POSTGRES_DB: shareway_trip_planning
+      POSTGRES_USER: shareway
+      POSTGRES_PASSWORD: shareway
+    ports:
+      - "5433:5432"
+    volumes:
+      - trip_planning_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U shareway -d shareway_trip_planning"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  trip-planning-matching-service:
+    build: .
+    container_name: shareway-trip-planning-matching-service
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SERVER_PORT: 8081
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/shareway_trip_planning
+      SPRING_DATASOURCE_USERNAME: shareway
+      SPRING_DATASOURCE_PASSWORD: shareway
+    ports:
+      - "8081:8081"
+
+volumes:
+  trip_planning_postgres_data:
