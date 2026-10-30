@@ -1,10 +1,11 @@
 package pe.edu.upc.shareway.tripplanning.trip.infrastructure;
 
 import java.util.List;
+import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import pe.edu.upc.shareway.tripplanning.trip.domain.MatchProposal;
 
-public interface MatchProposalRepository extends JpaRepository<MatchProposal, Long> {
+public interface MatchProposalRepository extends JpaRepository<MatchProposal, UUID> {
 
-  List<MatchProposal> findByTripRequestIdOrderByCreatedAtDesc(Long tripRequestId);
+  List<MatchProposal> findByTripRequestIdOrderByCreatedAtDesc(UUID tripRequestId);
 }

@@ -8,6 +8,7 @@ import java.math.RoundingMode;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pe.edu.upc.shareway.tripplanning.trip.domain.DriverAvailability;
@@ -79,7 +80,7 @@ public class TripMatchingService {
   }
 
   @Transactional
-  public List<MatchProposal> generateMatchProposals(Long tripRequestId) {
+  public List<MatchProposal> generateMatchProposals(UUID tripRequestId) {
     List<MatchProposal> existingProposals =
         matchProposalRepository.findByTripRequestIdOrderByCreatedAtDesc(tripRequestId);
     if (!existingProposals.isEmpty()) {
@@ -113,7 +114,7 @@ public class TripMatchingService {
   }
 
   @Transactional(readOnly = true)
-  public List<MatchProposal> listMatchProposals(Long tripRequestId) {
+  public List<MatchProposal> listMatchProposals(UUID tripRequestId) {
     return deduplicateByDriverId(
         matchProposalRepository.findByTripRequestIdOrderByCreatedAtDesc(tripRequestId)
     );

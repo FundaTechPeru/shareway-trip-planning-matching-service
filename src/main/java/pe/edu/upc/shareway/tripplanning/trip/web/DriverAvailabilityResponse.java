@@ -2,10 +2,11 @@ package pe.edu.upc.shareway.tripplanning.trip.web;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.UUID;
 import pe.edu.upc.shareway.tripplanning.trip.domain.DriverAvailability;
 
 public record DriverAvailabilityResponse(
-    Long id,
+    UUID id,
     Long driverId,
     String operationZone,
     LocalDate availableDate,
