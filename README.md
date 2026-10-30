@@ -27,6 +27,10 @@ Este servicio concentra las reglas de negocio relacionadas con:
 
 No debe manejar pagos, liquidaciones, validacion de abordaje, notificaciones en tiempo real ni gestion documental del conductor. Esos flujos pertenecen a otros bounded contexts.
 
+## Identificadores
+
+Los IDs propios del servicio (`tripRequest.id`, `driverAvailability.id` y `matchProposal.id`) son UUID. Las rutas que reciben `tripRequestId` esperan un UUID. Los campos `driverId` y `passengerId` permanecen como `Long`, ya que referencian IDs administrados por los microservicios de identidad y conductores.
+
 ## Ejecutar localmente
 
 ```bash
@@ -154,7 +158,7 @@ curl -X POST http://localhost:8081/api/v1/trip-requests \
 Generar propuestas:
 
 ```bash
-curl -X POST http://localhost:8081/api/v1/trip-requests/1/match-proposals
+curl -X POST http://localhost:8081/api/v1/trip-requests/<UUID_DE_LA_SOLICITUD>/match-proposals
 ```
 
 ## Verificacion

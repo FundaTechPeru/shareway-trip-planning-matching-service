@@ -3,11 +3,12 @@ package pe.edu.upc.shareway.tripplanning.trip.web;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.UUID;
 import pe.edu.upc.shareway.tripplanning.trip.domain.TripRequest;
 import pe.edu.upc.shareway.tripplanning.trip.domain.TripRequestStatus;
 
 public record TripRequestResponse(
-    Long id,
+    UUID id,
     Long passengerId,
     String originLabel,
     String destinationLabel,

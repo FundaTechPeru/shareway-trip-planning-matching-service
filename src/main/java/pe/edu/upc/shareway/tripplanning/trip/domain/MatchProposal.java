@@ -13,14 +13,15 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.UUID;
 
 @Entity
 @Table(name = "match_proposals")
 public class MatchProposal {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  @GeneratedValue(strategy = GenerationType.UUID)
+  private UUID id;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "trip_request_id", nullable = false)
@@ -53,7 +54,7 @@ public class MatchProposal {
     this.estimatedDurationMinutes = estimatedDurationMinutes;
   }
 
-  public Long getId() {
+  public UUID getId() {
     return id;
   }
 

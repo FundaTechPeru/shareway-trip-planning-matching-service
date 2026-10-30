@@ -2,11 +2,12 @@ package pe.edu.upc.shareway.tripplanning.trip.web;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.UUID;
 import pe.edu.upc.shareway.tripplanning.trip.domain.MatchProposal;
 import pe.edu.upc.shareway.tripplanning.trip.domain.MatchProposalStatus;
 
 public record MatchProposalResponse(
-    Long id,
+    UUID id,
     Long driverId,
     BigDecimal estimatedFare,
     int estimatedDurationMinutes,
