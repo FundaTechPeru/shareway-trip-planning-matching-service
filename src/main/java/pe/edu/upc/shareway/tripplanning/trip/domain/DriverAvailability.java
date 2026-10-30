@@ -11,14 +11,15 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "driver_availabilities")
 public class DriverAvailability {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  @GeneratedValue(strategy = GenerationType.UUID)
+  private UUID id;
 
   @NotNull
   @Column(nullable = false)
@@ -57,7 +58,7 @@ public class DriverAvailability {
     this.availableSeats = availableSeats;
   }
 
-  public Long getId() {
+  public UUID getId() {
     return id;
   }
 

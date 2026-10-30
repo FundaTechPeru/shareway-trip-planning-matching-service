@@ -3,12 +3,13 @@ package pe.edu.upc.shareway.tripplanning.trip.infrastructure;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import pe.edu.upc.shareway.tripplanning.trip.domain.DriverAvailability;
 
-public interface DriverAvailabilityRepository extends JpaRepository<DriverAvailability, Long> {
+public interface DriverAvailabilityRepository extends JpaRepository<DriverAvailability, UUID> {
 
   @Query("""
       select availability

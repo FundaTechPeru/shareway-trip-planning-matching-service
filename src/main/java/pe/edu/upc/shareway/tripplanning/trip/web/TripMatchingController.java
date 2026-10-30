@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -73,7 +74,7 @@ public class TripMatchingController {
       description = "Creates idempotent match proposals for a trip request using compatible driver availability."
   )
   ResponseEntity<List<MatchProposalResponse>> generateMatchProposals(
-      @PathVariable Long tripRequestId
+      @PathVariable UUID tripRequestId
   ) {
     List<MatchProposalResponse> responses = tripMatchingService.generateMatchProposals(tripRequestId)
         .stream()
@@ -88,7 +89,7 @@ public class TripMatchingController {
       description = "Returns generated proposals for a trip request."
   )
   ResponseEntity<List<MatchProposalResponse>> listMatchProposals(
-      @PathVariable Long tripRequestId
+      @PathVariable UUID tripRequestId
   ) {
     List<MatchProposalResponse> responses = tripMatchingService.listMatchProposals(tripRequestId)
         .stream()

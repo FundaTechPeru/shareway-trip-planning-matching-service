@@ -17,14 +17,15 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "trip_requests")
 public class TripRequest {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  @GeneratedValue(strategy = GenerationType.UUID)
+  private UUID id;
 
   @NotNull
   @Column(nullable = false)
@@ -110,7 +111,7 @@ public class TripRequest {
     this.seatsRequested = seatsRequested;
   }
 
-  public Long getId() {
+  public UUID getId() {
     return id;
   }
 

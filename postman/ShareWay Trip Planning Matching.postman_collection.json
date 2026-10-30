@@ -31,6 +31,19 @@
     },
     {
       "name": "Create trip request",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (pm.response.code === 201) {",
+              "  pm.collectionVariables.set('tripRequestId', pm.response.json().id);",
+              "}"
+            ]
+          }
+        }
+      ],
       "request": {
         "method": "POST",
         "header": [
@@ -50,14 +63,14 @@
       "name": "Generate match proposals",
       "request": {
         "method": "POST",
-        "url": "{{baseUrl}}/api/v1/trip-requests/1/match-proposals"
+        "url": "{{baseUrl}}/api/v1/trip-requests/{{tripRequestId}}/match-proposals"
       }
     },
     {
       "name": "List match proposals",
       "request": {
         "method": "GET",
-        "url": "{{baseUrl}}/api/v1/trip-requests/1/match-proposals"
+        "url": "{{baseUrl}}/api/v1/trip-requests/{{tripRequestId}}/match-proposals"
       }
     }
   ],
@@ -65,6 +78,10 @@
     {
       "key": "baseUrl",
       "value": "http://localhost:8081"
+    },
+    {
+      "key": "tripRequestId",
+      "value": ""
     }
   ]
 }

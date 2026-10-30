@@ -1,10 +1,11 @@
 package pe.edu.upc.shareway.tripplanning.trip.infrastructure;
 
 import java.util.List;
+import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import pe.edu.upc.shareway.tripplanning.trip.domain.TripRequest;
 
-public interface TripRequestRepository extends JpaRepository<TripRequest, Long> {
+public interface TripRequestRepository extends JpaRepository<TripRequest, UUID> {
 
   List<TripRequest> findAllByOrderByCreatedAtDesc();
 }
