@@ -23,7 +23,7 @@ public class DriverAvailability {
 
   @NotNull
   @Column(nullable = false)
-  private Long driverId;
+  private UUID driverId;
 
   @NotBlank
   @Column(nullable = false, length = 120)
@@ -48,7 +48,7 @@ public class DriverAvailability {
   protected DriverAvailability() {
   }
 
-  public DriverAvailability(Long driverId, String operationZone, LocalDate availableDate,
+  public DriverAvailability(UUID driverId, String operationZone, LocalDate availableDate,
       LocalTime startTime, LocalTime endTime, int availableSeats) {
     this.driverId = driverId;
     this.operationZone = operationZone;
@@ -62,7 +62,7 @@ public class DriverAvailability {
     return id;
   }
 
-  public Long getDriverId() {
+  public UUID getDriverId() {
     return driverId;
   }
 

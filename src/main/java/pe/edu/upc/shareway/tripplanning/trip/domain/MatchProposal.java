@@ -28,7 +28,7 @@ public class MatchProposal {
   private TripRequest tripRequest;
 
   @Column(nullable = false)
-  private Long driverId;
+  private UUID driverId;
 
   @Column(nullable = false, precision = 8, scale = 2)
   private BigDecimal estimatedFare;
@@ -46,7 +46,7 @@ public class MatchProposal {
   protected MatchProposal() {
   }
 
-  public MatchProposal(TripRequest tripRequest, Long driverId, BigDecimal estimatedFare,
+  public MatchProposal(TripRequest tripRequest, UUID driverId, BigDecimal estimatedFare,
       int estimatedDurationMinutes) {
     this.tripRequest = tripRequest;
     this.driverId = driverId;
@@ -58,7 +58,7 @@ public class MatchProposal {
     return id;
   }
 
-  public Long getDriverId() {
+  public UUID getDriverId() {
     return driverId;
   }
 

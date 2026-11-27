@@ -7,7 +7,7 @@ import pe.edu.upc.shareway.tripplanning.trip.domain.DriverAvailability;
 
 public record DriverAvailabilityResponse(
     UUID id,
-    Long driverId,
+    UUID driverId,
     String operationZone,
     LocalDate availableDate,
     LocalTime startTime,

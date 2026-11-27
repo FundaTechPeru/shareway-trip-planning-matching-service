@@ -8,4 +8,6 @@ import pe.edu.upc.shareway.tripplanning.trip.domain.TripRequest;
 public interface TripRequestRepository extends JpaRepository<TripRequest, UUID> {
 
   List<TripRequest> findAllByOrderByCreatedAtDesc();
+
+  List<TripRequest> findByPassengerIdOrderByCreatedAtDesc(UUID passengerId);
 }

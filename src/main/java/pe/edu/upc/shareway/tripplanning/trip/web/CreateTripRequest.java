@@ -1,5 +1,6 @@
 package pe.edu.upc.shareway.tripplanning.trip.web;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
@@ -9,8 +10,12 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+/**
+ * Request body for {@code POST /api/v1/trip-requests}. The passenger is taken from the {@code X-User-Id}
+ * gateway header; a {@code passengerId} sent by older clients is ignored.
+ */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public record CreateTripRequest(
-    @NotNull Long passengerId,
     @NotBlank String originLabel,
     @NotBlank String destinationLabel,
     @NotBlank String operationZone,
