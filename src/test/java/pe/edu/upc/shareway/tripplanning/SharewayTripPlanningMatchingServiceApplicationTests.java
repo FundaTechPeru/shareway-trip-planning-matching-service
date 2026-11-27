@@ -8,12 +8,15 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import pe.edu.upc.shareway.tripplanning.shared.security.GatewayUser;
+import pe.edu.upc.shareway.tripplanning.shared.security.UserRole;
 import pe.edu.upc.shareway.tripplanning.trip.application.TripMatchingService;
 import pe.edu.upc.shareway.tripplanning.trip.domain.MatchProposal;
 import pe.edu.upc.shareway.tripplanning.trip.domain.TripRequest;
@@ -26,6 +29,10 @@ import pe.edu.upc.shareway.tripplanning.trip.web.CreateTripRequest;
 @SpringBootTest
 @AutoConfigureMockMvc
 class SharewayTripPlanningMatchingServiceApplicationTests {
+
+	private static final UUID DRIVER_ID = UUID.fromString("6f1d2a3b-4c5d-4e6f-8a9b-0c1d2e3f4a5b");
+	private static final UUID PASSENGER_ID = UUID.fromString("0b8c7d6e-5f4a-4b3c-9d2e-1f0a9b8c7d6e");
+	private static final GatewayUser PASSENGER = new GatewayUser(PASSENGER_ID, UserRole.PASSENGER);
 
 	@Autowired
 	private TripMatchingService tripMatchingService;
@@ -55,16 +62,14 @@ class SharewayTripPlanningMatchingServiceApplicationTests {
 
 	@Test
 	void generateMatchProposalsIsIdempotentForTheSameTripRequest() {
-		tripMatchingService.createDriverAvailability(new CreateDriverAvailabilityRequest(
-				10L,
+		tripMatchingService.createDriverAvailability(DRIVER_ID, new CreateDriverAvailabilityRequest(
 				"Chorrillos",
 				LocalDate.of(2026, 10, 4),
 				LocalTime.of(7, 0),
 				LocalTime.of(9, 0),
 				3
 		));
-		TripRequest tripRequest = tripMatchingService.createTripRequest(new CreateTripRequest(
-				25L,
+		TripRequest tripRequest = tripMatchingService.createTripRequest(PASSENGER_ID, new CreateTripRequest(
 				"UPC Monterrico",
 				"Chorrillos",
 				"Chorrillos",
@@ -78,8 +83,8 @@ class SharewayTripPlanningMatchingServiceApplicationTests {
 				1
 		));
 
-		List<MatchProposal> firstRun = tripMatchingService.generateMatchProposals(tripRequest.getId());
-		List<MatchProposal> secondRun = tripMatchingService.generateMatchProposals(tripRequest.getId());
+		List<MatchProposal> firstRun = tripMatchingService.generateMatchProposals(tripRequest.getId(), PASSENGER);
+		List<MatchProposal> secondRun = tripMatchingService.generateMatchProposals(tripRequest.getId(), PASSENGER);
 
 		assertThat(firstRun).hasSize(1);
 		assertThat(secondRun).hasSize(1);
@@ -90,17 +95,15 @@ class SharewayTripPlanningMatchingServiceApplicationTests {
 	@Test
 	void generateMatchProposalsReturnsOneProposalPerDriver() {
 		CreateDriverAvailabilityRequest availability = new CreateDriverAvailabilityRequest(
-				10L,
 				"Chorrillos",
 				LocalDate.of(2026, 10, 4),
 				LocalTime.of(7, 0),
 				LocalTime.of(9, 0),
 				3
 		);
-		tripMatchingService.createDriverAvailability(availability);
-		tripMatchingService.createDriverAvailability(availability);
-		TripRequest tripRequest = tripMatchingService.createTripRequest(new CreateTripRequest(
-				25L,
+		tripMatchingService.createDriverAvailability(DRIVER_ID, availability);
+		tripMatchingService.createDriverAvailability(DRIVER_ID, availability);
+		TripRequest tripRequest = tripMatchingService.createTripRequest(PASSENGER_ID, new CreateTripRequest(
 				"UPC Monterrico",
 				"Chorrillos",
 				"Chorrillos",
@@ -114,12 +117,12 @@ class SharewayTripPlanningMatchingServiceApplicationTests {
 				1
 		));
 
-		List<MatchProposal> proposals = tripMatchingService.generateMatchProposals(tripRequest.getId());
+		List<MatchProposal> proposals = tripMatchingService.generateMatchProposals(tripRequest.getId(), PASSENGER);
 
 		assertThat(proposals)
 				.hasSize(1)
 				.extracting(MatchProposal::getDriverId)
-				.containsExactly(10L);
+				.containsExactly(DRIVER_ID);
 	}
 
 	@Test
@@ -133,6 +136,8 @@ class SharewayTripPlanningMatchingServiceApplicationTests {
 		assertThat(openApiJson)
 				.contains("Register driver availability")
 				.contains("Create trip request")
-				.contains("Generate match proposals");
+				.contains("Generate match proposals")
+				.contains("X-User-Id")
+				.contains("X-User-Role");
 	}
 }

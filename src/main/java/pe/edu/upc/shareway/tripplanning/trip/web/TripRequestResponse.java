@@ -9,7 +9,7 @@ import pe.edu.upc.shareway.tripplanning.trip.domain.TripRequestStatus;
 
 public record TripRequestResponse(
     UUID id,
-    Long passengerId,
+    UUID passengerId,
     String originLabel,
     String destinationLabel,
     String operationZone,

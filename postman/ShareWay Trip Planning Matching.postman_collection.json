@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "ShareWay Trip Planning & Matching",
-    "description": "TP1 collection for validating the Trip Planning & Matching microservice.",
+    "description": "TP1 collection for validating the Trip Planning & Matching microservice. Calls go straight to the service, so each request sets the X-User-Id and X-User-Role headers that the API Gateway normally forwards after validating the JWT.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -20,11 +20,19 @@
           {
             "key": "Content-Type",
             "value": "application/json"
+          },
+          {
+            "key": "X-User-Id",
+            "value": "{{driverId}}"
+          },
+          {
+            "key": "X-User-Role",
+            "value": "DRIVER"
           }
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"driverId\": 10,\n  \"operationZone\": \"Chorrillos\",\n  \"availableDate\": \"2026-10-04\",\n  \"startTime\": \"07:00:00\",\n  \"endTime\": \"09:00:00\",\n  \"availableSeats\": 3\n}"
+          "raw": "{\n  \"operationZone\": \"Chorrillos\",\n  \"availableDate\": \"2026-10-04\",\n  \"startTime\": \"07:00:00\",\n  \"endTime\": \"09:00:00\",\n  \"availableSeats\": 3\n}"
         },
         "url": "{{baseUrl}}/api/v1/driver-availabilities"
       }
@@ -50,12 +58,37 @@
           {
             "key": "Content-Type",
             "value": "application/json"
+          },
+          {
+            "key": "X-User-Id",
+            "value": "{{passengerId}}"
+          },
+          {
+            "key": "X-User-Role",
+            "value": "PASSENGER"
           }
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"passengerId\": 25,\n  \"originLabel\": \"UPC Monterrico\",\n  \"destinationLabel\": \"Chorrillos\",\n  \"operationZone\": \"Chorrillos\",\n  \"originLat\": -12.104800,\n  \"originLng\": -76.963200,\n  \"destinationLat\": -12.172100,\n  \"destinationLng\": -77.016400,\n  \"travelDate\": \"2026-10-04\",\n  \"earliestDeparture\": \"07:30:00\",\n  \"latestDeparture\": \"08:30:00\",\n  \"seatsRequested\": 1\n}"
+          "raw": "{\n  \"originLabel\": \"UPC Monterrico\",\n  \"destinationLabel\": \"Chorrillos\",\n  \"operationZone\": \"Chorrillos\",\n  \"originLat\": -12.104800,\n  \"originLng\": -76.963200,\n  \"destinationLat\": -12.172100,\n  \"destinationLng\": -77.016400,\n  \"travelDate\": \"2026-10-04\",\n  \"earliestDeparture\": \"07:30:00\",\n  \"latestDeparture\": \"08:30:00\",\n  \"seatsRequested\": 1\n}"
         },
+        "url": "{{baseUrl}}/api/v1/trip-requests"
+      }
+    },
+    {
+      "name": "List my trip requests",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-User-Id",
+            "value": "{{passengerId}}"
+          },
+          {
+            "key": "X-User-Role",
+            "value": "PASSENGER"
+          }
+        ],
         "url": "{{baseUrl}}/api/v1/trip-requests"
       }
     },
@@ -63,14 +96,34 @@
       "name": "Generate match proposals",
       "request": {
         "method": "POST",
-        "url": "{{baseUrl}}/api/v1/trip-requests/{{tripRequestId}}/match-proposals"
+        "url": "{{baseUrl}}/api/v1/trip-requests/{{tripRequestId}}/match-proposals",
+        "header": [
+          {
+            "key": "X-User-Id",
+            "value": "{{passengerId}}"
+          },
+          {
+            "key": "X-User-Role",
+            "value": "PASSENGER"
+          }
+        ]
       }
     },
     {
       "name": "List match proposals",
       "request": {
         "method": "GET",
-        "url": "{{baseUrl}}/api/v1/trip-requests/{{tripRequestId}}/match-proposals"
+        "url": "{{baseUrl}}/api/v1/trip-requests/{{tripRequestId}}/match-proposals",
+        "header": [
+          {
+            "key": "X-User-Id",
+            "value": "{{passengerId}}"
+          },
+          {
+            "key": "X-User-Role",
+            "value": "PASSENGER"
+          }
+        ]
       }
     }
   ],
@@ -78,6 +131,14 @@
     {
       "key": "baseUrl",
       "value": "http://localhost:8081"
+    },
+    {
+      "key": "passengerId",
+      "value": "0b8c7d6e-5f4a-4b3c-9d2e-1f0a9b8c7d6e"
+    },
+    {
+      "key": "driverId",
+      "value": "6f1d2a3b-4c5d-4e6f-8a9b-0c1d2e3f4a5b"
     },
     {
       "key": "tripRequestId",

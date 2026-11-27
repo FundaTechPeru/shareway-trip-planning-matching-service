@@ -29,7 +29,32 @@ No debe manejar pagos, liquidaciones, validacion de abordaje, notificaciones en 
 
 ## Identificadores
 
-Los IDs propios del servicio (`tripRequest.id`, `driverAvailability.id` y `matchProposal.id`) son UUID. Las rutas que reciben `tripRequestId` esperan un UUID. Los campos `driverId` y `passengerId` permanecen como `Long`, ya que referencian IDs administrados por los microservicios de identidad y conductores.
+Los IDs propios del servicio (`tripRequest.id`, `driverAvailability.id` y `matchProposal.id`) son UUID. Las rutas que reciben `tripRequestId` esperan un UUID.
+
+Los campos `passengerId` y `driverId` tambien son UUID: corresponden al `sub` del JWT emitido por Driver Management. La migracion `V3__change_user_ids_to_uuid.sql` convierte los valores numericos existentes al mismo formato determinista usado en V2 (por ejemplo, `25` pasa a `00000000-0000-0000-0000-000000000025`).
+
+## Identidad del usuario (API Gateway)
+
+El API Gateway valida el JWT y reenvia la identidad del usuario en dos cabeceras. Este servicio no valida el token (no tiene `JWT_SECRET`) y confia en esas cabeceras, por lo que no debe quedar expuesto a Internet sin pasar por el gateway.
+
+| Cabecera | Valor |
+| --- | --- |
+| `X-User-Id` | UUID del usuario (`sub` del JWT) |
+| `X-User-Role` | `PASSENGER`, `DRIVER` o `ADMIN` |
+
+Reglas:
+
+- `POST /api/v1/trip-requests`: requiere rol `PASSENGER`; el pasajero es `X-User-Id`.
+- `POST /api/v1/driver-availabilities`: requiere rol `DRIVER`; el conductor es `X-User-Id`.
+- `GET /api/v1/trip-requests`: devuelve solo las solicitudes de `X-User-Id`; `ADMIN` ve todas.
+- `GET` y `POST /api/v1/trip-requests/{tripRequestId}/match-proposals`: solo el pasajero duenio de la solicitud o un `ADMIN`. Para cualquier otro usuario responde `404`.
+- `passengerId` y `driverId` ya no forman parte de los cuerpos de entrada. Si un cliente los sigue enviando, se ignoran.
+
+Errores (formato `ApiError`):
+
+- `401 Unauthorized`: falta `X-User-Id` o no es un UUID valido.
+- `403 Forbidden`: `X-User-Role` falta o no corresponde a la operacion.
+- `404 Not found`: la solicitud de viaje no existe o pertenece a otro usuario.
 
 ## Ejecutar localmente
 
@@ -119,13 +144,16 @@ https://<render-service>.onrender.com/v3/api-docs
 
 ## Endpoints iniciales
 
+Los ejemplos llaman al servicio directamente, por eso envian las cabeceras que normalmente agrega el API Gateway.
+
 Crear disponibilidad de conductor:
 
 ```bash
 curl -X POST http://localhost:8081/api/v1/driver-availabilities \
   -H "Content-Type: application/json" \
+  -H "X-User-Id: 6f1d2a3b-4c5d-4e6f-8a9b-0c1d2e3f4a5b" \
+  -H "X-User-Role: DRIVER" \
   -d '{
-    "driverId": 10,
     "operationZone": "Chorrillos",
     "availableDate": "2026-10-04",
     "startTime": "07:00:00",
@@ -139,8 +167,9 @@ Crear solicitud de viaje:
 ```bash
 curl -X POST http://localhost:8081/api/v1/trip-requests \
   -H "Content-Type: application/json" \
+  -H "X-User-Id: 0b8c7d6e-5f4a-4b3c-9d2e-1f0a9b8c7d6e" \
+  -H "X-User-Role: PASSENGER" \
   -d '{
-    "passengerId": 25,
     "originLabel": "UPC Monterrico",
     "destinationLabel": "Chorrillos",
     "operationZone": "Chorrillos",
@@ -158,7 +187,17 @@ curl -X POST http://localhost:8081/api/v1/trip-requests \
 Generar propuestas:
 
 ```bash
-curl -X POST http://localhost:8081/api/v1/trip-requests/<UUID_DE_LA_SOLICITUD>/match-proposals
+curl -X POST http://localhost:8081/api/v1/trip-requests/<UUID_DE_LA_SOLICITUD>/match-proposals \
+  -H "X-User-Id: 0b8c7d6e-5f4a-4b3c-9d2e-1f0a9b8c7d6e" \
+  -H "X-User-Role: PASSENGER"
+```
+
+Listar mis solicitudes de viaje:
+
+```bash
+curl http://localhost:8081/api/v1/trip-requests \
+  -H "X-User-Id: 0b8c7d6e-5f4a-4b3c-9d2e-1f0a9b8c7d6e" \
+  -H "X-User-Role: PASSENGER"
 ```
 
 ## Verificacion

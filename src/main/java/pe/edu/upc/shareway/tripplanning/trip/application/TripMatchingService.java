@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pe.edu.upc.shareway.tripplanning.shared.security.GatewayUser;
 import pe.edu.upc.shareway.tripplanning.trip.domain.DriverAvailability;
 import pe.edu.upc.shareway.tripplanning.trip.domain.MatchProposal;
 import pe.edu.upc.shareway.tripplanning.trip.domain.TripRequest;
@@ -41,9 +42,9 @@ public class TripMatchingService {
   }
 
   @Transactional
-  public TripRequest createTripRequest(CreateTripRequest request) {
+  public TripRequest createTripRequest(UUID passengerId, CreateTripRequest request) {
     TripRequest tripRequest = new TripRequest(
-        request.passengerId(),
+        passengerId,
         request.originLabel(),
         request.destinationLabel(),
         request.operationZone(),
@@ -61,9 +62,10 @@ public class TripMatchingService {
   }
 
   @Transactional
-  public DriverAvailability createDriverAvailability(CreateDriverAvailabilityRequest request) {
+  public DriverAvailability createDriverAvailability(UUID driverId,
+      CreateDriverAvailabilityRequest request) {
     DriverAvailability availability = new DriverAvailability(
-        request.driverId(),
+        driverId,
         request.operationZone(),
         request.availableDate(),
         request.startTime(),
@@ -75,20 +77,22 @@ public class TripMatchingService {
   }
 
   @Transactional(readOnly = true)
-  public List<TripRequest> listTripRequests() {
-    return tripRequestRepository.findAllByOrderByCreatedAtDesc();
+  public List<TripRequest> listTripRequests(GatewayUser requester) {
+    if (requester.isAdmin()) {
+      return tripRequestRepository.findAllByOrderByCreatedAtDesc();
+    }
+    return tripRequestRepository.findByPassengerIdOrderByCreatedAtDesc(requester.id());
   }
 
   @Transactional
-  public List<MatchProposal> generateMatchProposals(UUID tripRequestId) {
+  public List<MatchProposal> generateMatchProposals(UUID tripRequestId, GatewayUser requester) {
+    TripRequest tripRequest = findAccessibleTripRequest(tripRequestId, requester);
+
     List<MatchProposal> existingProposals =
         matchProposalRepository.findByTripRequestIdOrderByCreatedAtDesc(tripRequestId);
     if (!existingProposals.isEmpty()) {
       return deduplicateByDriverId(existingProposals);
     }
-
-    TripRequest tripRequest = tripRequestRepository.findById(tripRequestId)
-        .orElseThrow(() -> new EntityNotFoundException("Trip request not found: " + tripRequestId));
 
     List<DriverAvailability> candidates = driverAvailabilityRepository.findCandidates(
         tripRequest.getOperationZone(),
@@ -98,7 +102,7 @@ public class TripMatchingService {
         tripRequest.getSeatsRequested()
     );
 
-    Set<Long> proposedDriverIds = new HashSet<>();
+    Set<UUID> proposedDriverIds = new HashSet<>();
     List<MatchProposal> proposals = candidates.stream()
         .filter(candidate -> proposedDriverIds.add(candidate.getDriverId()))
         .limit(5)
@@ -114,10 +118,21 @@ public class TripMatchingService {
   }
 
   @Transactional(readOnly = true)
-  public List<MatchProposal> listMatchProposals(UUID tripRequestId) {
+  public List<MatchProposal> listMatchProposals(UUID tripRequestId, GatewayUser requester) {
+    findAccessibleTripRequest(tripRequestId, requester);
     return deduplicateByDriverId(
         matchProposalRepository.findByTripRequestIdOrderByCreatedAtDesc(tripRequestId)
     );
+  }
+
+  /**
+   * Returns the trip request when the requester owns it or is an admin. Requests owned by someone
+   * else are reported as not found so their existence is not disclosed.
+   */
+  private TripRequest findAccessibleTripRequest(UUID tripRequestId, GatewayUser requester) {
+    return tripRequestRepository.findById(tripRequestId)
+        .filter(tripRequest -> requester.canAccessResourceOwnedBy(tripRequest.getPassengerId()))
+        .orElseThrow(() -> new EntityNotFoundException("Trip request not found: " + tripRequestId));
   }
 
   private BigDecimal estimateFare(TripRequest tripRequest) {
@@ -133,7 +148,7 @@ public class TripMatchingService {
   }
 
   private List<MatchProposal> deduplicateByDriverId(List<MatchProposal> proposals) {
-    LinkedHashMap<Long, MatchProposal> proposalsByDriver = new LinkedHashMap<>();
+    LinkedHashMap<UUID, MatchProposal> proposalsByDriver = new LinkedHashMap<>();
     for (MatchProposal proposal : proposals) {
       proposalsByDriver.putIfAbsent(proposal.getDriverId(), proposal);
     }

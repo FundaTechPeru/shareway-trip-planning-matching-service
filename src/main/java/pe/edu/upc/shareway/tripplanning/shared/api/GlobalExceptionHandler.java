@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import pe.edu.upc.shareway.tripplanning.shared.security.ForbiddenException;
+import pe.edu.upc.shareway.tripplanning.shared.security.UnauthenticatedException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -32,5 +34,23 @@ public class GlobalExceptionHandler {
   ) {
     return ResponseEntity.status(HttpStatus.NOT_FOUND)
         .body(ApiError.of(404, "Not found", exception.getMessage(), request.getRequestURI()));
+  }
+
+  @ExceptionHandler(UnauthenticatedException.class)
+  ResponseEntity<ApiError> handleUnauthenticated(
+      UnauthenticatedException exception,
+      HttpServletRequest request
+  ) {
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+        .body(ApiError.of(401, "Unauthorized", exception.getMessage(), request.getRequestURI()));
+  }
+
+  @ExceptionHandler(ForbiddenException.class)
+  ResponseEntity<ApiError> handleForbidden(
+      ForbiddenException exception,
+      HttpServletRequest request
+  ) {
+    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+        .body(ApiError.of(403, "Forbidden", exception.getMessage(), request.getRequestURI()));
   }
 }

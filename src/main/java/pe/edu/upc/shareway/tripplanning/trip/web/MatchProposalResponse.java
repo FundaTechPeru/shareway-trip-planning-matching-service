@@ -8,7 +8,7 @@ import pe.edu.upc.shareway.tripplanning.trip.domain.MatchProposalStatus;
 
 public record MatchProposalResponse(
     UUID id,
-    Long driverId,
+    UUID driverId,
     BigDecimal estimatedFare,
     int estimatedDurationMinutes,
     MatchProposalStatus status,

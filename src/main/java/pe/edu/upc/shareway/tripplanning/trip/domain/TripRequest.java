@@ -29,7 +29,7 @@ public class TripRequest {
 
   @NotNull
   @Column(nullable = false)
-  private Long passengerId;
+  private UUID passengerId;
 
   @NotBlank
   @Column(nullable = false, length = 160)
@@ -93,7 +93,7 @@ public class TripRequest {
   protected TripRequest() {
   }
 
-  public TripRequest(Long passengerId, String originLabel, String destinationLabel,
+  public TripRequest(UUID passengerId, String originLabel, String destinationLabel,
       String operationZone, BigDecimal originLat, BigDecimal originLng, BigDecimal destinationLat,
       BigDecimal destinationLng, LocalDate travelDate, LocalTime earliestDeparture,
       LocalTime latestDeparture, int seatsRequested) {
@@ -115,7 +115,7 @@ public class TripRequest {
     return id;
   }
 
-  public Long getPassengerId() {
+  public UUID getPassengerId() {
     return passengerId;
   }
 
