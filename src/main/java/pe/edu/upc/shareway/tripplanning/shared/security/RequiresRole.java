@@ -7,8 +7,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Restricts a handler method to the given gateway roles. Enforced when the method declares a
- * {@link GatewayUser} parameter.
+ * Restricts a handler method to the given token roles. Enforced when the method declares a
+ * {@link AuthenticatedUser} parameter.
  */
 @Documented
 @Target(ElementType.METHOD)

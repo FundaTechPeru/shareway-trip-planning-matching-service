@@ -2,6 +2,8 @@ package pe.edu.upc.shareway.tripplanning.trip.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -13,6 +15,10 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.UUID;
 
+/**
+ * Availability published by a driver. Booking &amp; Pricing calls it a trip group: its id is the
+ * {@code groupId} of the integration events.
+ */
 @Entity
 @Table(name = "driver_availabilities")
 public class DriverAvailability {
@@ -44,6 +50,10 @@ public class DriverAvailability {
   @Min(1)
   @Column(nullable = false)
   private int availableSeats;
+
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false, length = 20)
+  private DriverAvailabilityStatus status = DriverAvailabilityStatus.OPEN;
 
   protected DriverAvailability() {
   }
@@ -84,5 +94,9 @@ public class DriverAvailability {
 
   public int getAvailableSeats() {
     return availableSeats;
+  }
+
+  public DriverAvailabilityStatus getStatus() {
+    return status;
   }
 }

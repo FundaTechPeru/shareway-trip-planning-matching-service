@@ -27,6 +27,10 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/shareway_trip_planning
       SPRING_DATASOURCE_USERNAME: shareway
       SPRING_DATASOURCE_PASSWORD: shareway
+      # The dev profile supplies the shared development JWT_SECRET and INTERNAL_API_KEY; without it
+      # the service refuses to start unless both variables are set.
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      BOOKING_URL: ${BOOKING_URL:-https://shareway-booking-pricing.onrender.com}
     ports:
       - "8081:8081"
 

@@ -11,14 +11,13 @@ import java.util.Set;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pe.edu.upc.shareway.tripplanning.shared.security.GatewayUser;
+import pe.edu.upc.shareway.tripplanning.shared.security.AuthenticatedUser;
 import pe.edu.upc.shareway.tripplanning.trip.domain.DriverAvailability;
 import pe.edu.upc.shareway.tripplanning.trip.domain.MatchProposal;
 import pe.edu.upc.shareway.tripplanning.trip.domain.TripRequest;
 import pe.edu.upc.shareway.tripplanning.trip.infrastructure.DriverAvailabilityRepository;
 import pe.edu.upc.shareway.tripplanning.trip.infrastructure.MatchProposalRepository;
 import pe.edu.upc.shareway.tripplanning.trip.infrastructure.TripRequestRepository;
-import pe.edu.upc.shareway.tripplanning.trip.web.CreateDriverAvailabilityRequest;
 import pe.edu.upc.shareway.tripplanning.trip.web.CreateTripRequest;
 
 @Service
@@ -61,23 +60,8 @@ public class TripMatchingService {
     return tripRequestRepository.save(tripRequest);
   }
 
-  @Transactional
-  public DriverAvailability createDriverAvailability(UUID driverId,
-      CreateDriverAvailabilityRequest request) {
-    DriverAvailability availability = new DriverAvailability(
-        driverId,
-        request.operationZone(),
-        request.availableDate(),
-        request.startTime(),
-        request.endTime(),
-        request.availableSeats()
-    );
-
-    return driverAvailabilityRepository.save(availability);
-  }
-
   @Transactional(readOnly = true)
-  public List<TripRequest> listTripRequests(GatewayUser requester) {
+  public List<TripRequest> listTripRequests(AuthenticatedUser requester) {
     if (requester.isAdmin()) {
       return tripRequestRepository.findAllByOrderByCreatedAtDesc();
     }
@@ -85,7 +69,8 @@ public class TripMatchingService {
   }
 
   @Transactional
-  public List<MatchProposal> generateMatchProposals(UUID tripRequestId, GatewayUser requester) {
+  public List<MatchProposal> generateMatchProposals(UUID tripRequestId,
+      AuthenticatedUser requester) {
     TripRequest tripRequest = findAccessibleTripRequest(tripRequestId, requester);
 
     List<MatchProposal> existingProposals =
@@ -108,7 +93,7 @@ public class TripMatchingService {
         .limit(5)
         .map(candidate -> new MatchProposal(
             tripRequest,
-            candidate.getDriverId(),
+            candidate,
             estimateFare(tripRequest),
             estimateDurationMinutes(tripRequest)
         ))
@@ -118,7 +103,7 @@ public class TripMatchingService {
   }
 
   @Transactional(readOnly = true)
-  public List<MatchProposal> listMatchProposals(UUID tripRequestId, GatewayUser requester) {
+  public List<MatchProposal> listMatchProposals(UUID tripRequestId, AuthenticatedUser requester) {
     findAccessibleTripRequest(tripRequestId, requester);
     return deduplicateByDriverId(
         matchProposalRepository.findByTripRequestIdOrderByCreatedAtDesc(tripRequestId)
@@ -129,7 +114,7 @@ public class TripMatchingService {
    * Returns the trip request when the requester owns it or is an admin. Requests owned by someone
    * else are reported as not found so their existence is not disclosed.
    */
-  private TripRequest findAccessibleTripRequest(UUID tripRequestId, GatewayUser requester) {
+  private TripRequest findAccessibleTripRequest(UUID tripRequestId, AuthenticatedUser requester) {
     return tripRequestRepository.findById(tripRequestId)
         .filter(tripRequest -> requester.canAccessResourceOwnedBy(tripRequest.getPassengerId()))
         .orElseThrow(() -> new EntityNotFoundException("Trip request not found: " + tripRequestId));
