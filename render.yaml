@@ -20,3 +20,5 @@ services:
         sync: false
       - key: SPRING_FLYWAY_DEFAULT_SCHEMA
         sync: false
+      - key: INTERNAL_API_KEY
+        sync: false
