@@ -8,8 +8,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 /**
- * Request body for {@code POST /api/v1/driver-availabilities}. The driver is taken from the {@code X-User-Id}
- * gateway header; a {@code driverId} sent by older clients is ignored.
+ * Request body for {@code POST /api/v1/driver-availabilities}. The driver is the subject of the bearer
+ * token; a {@code driverId} sent by older clients is ignored.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record CreateDriverAvailabilityRequest(

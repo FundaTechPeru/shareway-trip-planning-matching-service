@@ -29,7 +29,10 @@ public class ServiceInfoController {
         "endpoints", List.of(
             "GET /api/v1/trip-requests",
             "POST /api/v1/trip-requests",
+            "GET /api/v1/driver-availabilities",
             "POST /api/v1/driver-availabilities",
+            "POST /api/v1/driver-availabilities/{driverAvailabilityId}/accept",
+            "POST /api/v1/driver-availabilities/{driverAvailabilityId}/reject",
             "GET /api/v1/trip-requests/{tripRequestId}/match-proposals",
             "POST /api/v1/trip-requests/{tripRequestId}/match-proposals"
         )

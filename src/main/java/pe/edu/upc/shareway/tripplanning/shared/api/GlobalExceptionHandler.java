@@ -36,6 +36,15 @@ public class GlobalExceptionHandler {
         .body(ApiError.of(404, "Not found", exception.getMessage(), request.getRequestURI()));
   }
 
+  @ExceptionHandler(ConflictException.class)
+  ResponseEntity<ApiError> handleConflict(
+      ConflictException exception,
+      HttpServletRequest request
+  ) {
+    return ResponseEntity.status(HttpStatus.CONFLICT)
+        .body(ApiError.of(409, "Conflict", exception.getMessage(), request.getRequestURI()));
+  }
+
   @ExceptionHandler(UnauthenticatedException.class)
   ResponseEntity<ApiError> handleUnauthenticated(
       UnauthenticatedException exception,

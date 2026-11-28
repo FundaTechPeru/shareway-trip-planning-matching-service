@@ -6,10 +6,16 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-public class GatewayUserWebConfig implements WebMvcConfigurer {
+public class SecurityWebConfig implements WebMvcConfigurer {
+
+  private final JwtService jwtService;
+
+  public SecurityWebConfig(JwtService jwtService) {
+    this.jwtService = jwtService;
+  }
 
   @Override
   public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-    resolvers.add(new GatewayUserArgumentResolver());
+    resolvers.add(new AuthenticatedUserArgumentResolver(jwtService));
   }
 }

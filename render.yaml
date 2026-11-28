@@ -20,5 +20,15 @@ services:
         sync: false
       - key: SPRING_FLYWAY_DEFAULT_SCHEMA
         sync: false
+      # Same JWT_SECRET as the API Gateway and Driver Management (at least 32 characters).
+      - key: JWT_SECRET
+        sync: false
+      # Key shared by the ShareWay services for internal calls (X-Internal-Api-Key).
       - key: INTERNAL_API_KEY
+        sync: false
+      # Booking & Pricing base URL; the service defaults to https://shareway-booking-pricing.onrender.com.
+      - key: BOOKING_URL
+        sync: false
+      # Enable after Booking's internal event receiver is deployed.
+      - key: OUTBOX_RELAY_ENABLED
         sync: false
